@@ -1,0 +1,31 @@
+name: A股成交额定时采集推送
+
+on:
+  schedule:
+    - cron: '50 1 * * 1-5'
+    - cron: '30 2 * * 1-5'
+    - cron: '30 3 * * 1-5'
+    - cron: '5 7 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  collect-and-push:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+      SUPABASE_KEY: ${{ secrets.SUPABASE_KEY }}
+      WECOM_WEBHOOK: ${{ secrets.WECOM_WEBHOOK }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install akshare pandas numpy requests
+
+      - name: Run tracker
+        run: python tracker.py
